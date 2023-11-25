@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from jogs.models import JoggingRecord
-from jogs.serializers import JoggingRecordSerializer, UserSerializer
+from jogs.serializers import JoggingRecordSerializer, UserSerializer, SignUpSerializer
 from django.contrib.auth.models import User
 from jogs.permissions import IsOwnerOrReadOnly
 from rest_framework import permissions
@@ -18,3 +18,8 @@ class JoggingRecordViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class SignUpViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = SignUpSerializer
