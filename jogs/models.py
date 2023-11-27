@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
@@ -14,8 +14,18 @@ def validate_positive_duration(value):
         )
 
 
+class CustomUser(AbstractUser):
+    USER_ROLE = [
+        ('regular', 'Regular User'),
+        ('user_manager', 'User Manager'),
+        ('admin', 'Admin'),
+    ]
+
+    role = models.CharField(max_length=255, choices=USER_ROLE, default='regular')
+
+
 class JoggingRecord(models.Model):
-    owner = models.ForeignKey(User, related_name='jogs', on_delete=models.CASCADE)
+    owner = models.ForeignKey(CustomUser, related_name='jogs', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     date = models.DateField()
     time = models.DurationField(validators=[validate_positive_duration])
