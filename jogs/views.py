@@ -1,6 +1,5 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-
 from jogs.models import JoggingRecord
 from jogs.serializers import JoggingRecordSerializer
 from jogs.permissions import IsOwnerOrReadOnly
