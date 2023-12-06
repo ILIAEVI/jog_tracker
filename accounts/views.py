@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -57,7 +57,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            login(request, user)
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
@@ -67,7 +66,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def logout(self, request):
         user = self.request.user
         if user.is_authenticated:
-            logout(request)
             user.auth_token.delete()
             return Response({'success': 'Successfully logged out'})
         else:
