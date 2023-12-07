@@ -53,21 +53,21 @@ def build_query_from_dynamic(query: str) -> Q:
             else:
                 stack.append(token)
         return stack[0]
-    tokenized = tokenize(query)
-    if tokenized.count('(') != tokenized.count(')'):
-        raise ValueError("Unbalanced parentheses in the query")
+    if query is not None:
+        tokenized = tokenize(query)
+        if tokenized.count('(') != tokenized.count(')'):
+            raise ValueError("Unbalanced parentheses in the query")
 
-    rpn_tokens = build_query_from_tokens(tokenized)
-    q_object = build_q_object_from_query(rpn_tokens)
-    return q_object
-
-
-string1 = "(date ne '2016-05-01') AND ((distance gt 20) OR (distance lt 10))"
-print(build_query_from_dynamic(string1))
+        rpn_tokens = build_query_from_tokens(tokenized)
+        q_object = build_q_object_from_query(rpn_tokens)
+        return q_object
 
 
 class DynamicFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         value = request.query_params.get("q")
-        query = build_query_from_dynamic(value)
-        return queryset.filter(query)
+        if value is not None:
+            query = build_query_from_dynamic(value)
+            return queryset.filter(query)
+        else:
+            return queryset

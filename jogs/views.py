@@ -13,8 +13,6 @@ class JoggingRecordViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     filter_backends = [DynamicFilterBackend]
 
-
-
     def get_permissions(self):
         if self.action == 'create':
             return [IsAuthenticated()]
