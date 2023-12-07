@@ -4,12 +4,16 @@ from jogs.models import JoggingRecord
 from jogs.serializers import JoggingRecordSerializer
 from jogs.permissions import IsOwnerOrReadOnly
 from rest_framework import permissions
+from jogs.filters import DynamicFilterBackend
 
 
 class JoggingRecordViewSet(viewsets.ModelViewSet):
     queryset = JoggingRecord.objects.all()
     serializer_class = JoggingRecordSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    filter_backends = [DynamicFilterBackend]
+
+
 
     def get_permissions(self):
         if self.action == 'create':

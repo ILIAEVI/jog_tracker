@@ -5,7 +5,6 @@ from django.db.models import Q
 def build_query_from_dynamic(query: str) -> Q:
     operators = {'or', 'and', 'eq', 'ne', 'gt', 'lt'}
     priority = {'or': 1, 'and': 2, 'eq': 3, 'ne': 3, 'gt': 4, 'lt': 4}
-    valid_fields = {'id', 'owner', 'created', 'date', 'time', 'distance', 'location', 'weather_condition'}
 
     def tokenize(input_string: str):
         lowercase_string = input_string.lower()
@@ -52,8 +51,6 @@ def build_query_from_dynamic(query: str) -> Q:
                 elif token == 'lt':
                     stack.append(Q(**{element1 + '__lt': element2}))
             else:
-                if token not in valid_fields:
-                    raise ValueError(f"Unknown field name: {token}")
                 stack.append(token)
         return stack[0]
     tokenized = tokenize(query)
