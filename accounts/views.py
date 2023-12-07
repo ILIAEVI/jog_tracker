@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from accounts.serializers import UserSerializer, SignUpSerializer, RoleUpdateSerializer, LogInSerializer
 from accounts.models import User
 from rest_framework.authtoken.models import Token
-from accounts.permissions import IsAdminOrReadOnly
+from accounts.permissions import IsAdminOrReadOnly, NotAuthenticated
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -40,31 +40,33 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['post'], url_path='signup', serializer_class=SignUpSerializer)
+    @action(detail=False, methods=['post'], url_path='signup', serializer_class=SignUpSerializer,
+            permission_classes=[NotAuthenticated])
     def signup(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=['post'], url_path='login', serializer_class=LogInSerializer)
+    @action(detail=False, methods=['post'], url_path='login', serializer_class=LogInSerializer,
+            permission_classes=[NotAuthenticated])
     def login(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
 
         user = authenticate(request, username=username, password=password)
 
-        if user:
+        if user is not None:
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    @action(detail=False, methods=['post'], url_path='logout')
+    @action(detail=False, methods=['post'], url_path='logout', permission_classes=[IsAuthenticated])
     def logout(self, request):
         user = self.request.user
         if user.is_authenticated:
-            Token.objects.filter(user=user).delete()
+            user.auth_token.delete()
             return Response({'success': 'Successfully logged out'})
         else:
             return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)

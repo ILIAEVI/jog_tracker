@@ -21,7 +21,7 @@ class JoggingRecord(models.Model):
     time = models.DurationField(validators=[validate_positive_duration])
     distance = models.FloatField(validators=[MinValueValidator(0)])
     location = models.CharField(max_length=255)
-    weather_condition = models.CharField(max_length=255, null=True, blank=True)
+    weather_condition = models.JSONField(max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ['created']
