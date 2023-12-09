@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  db:
+    container_name: jog_tracker_db
+    image: postgres:14.4-bullseye
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=jog
+      - POSTGRES_PASSWORD=jog
+      - POSTGRES_DB=jog
+    restart: always
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test:
+        ["CMD", "pg_isready", "-q", "-d", "jog_db", "-U", "jog"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+volumes:
+  postgres_data:
+  metabase_data:

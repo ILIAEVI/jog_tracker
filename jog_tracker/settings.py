@@ -14,7 +14,11 @@ from pathlib import Path
 import environ
 
 
-env = environ.Env()
+env = environ.Env(
+    SECRET_KEY=(str, 'super-secret'),
+    REDIS_HOST=(str, '127.0.0.1'),
+    REDIS_PORT=(int, 6379),
+)
 environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -149,23 +153,27 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'accounts.User'
 
-# CELERY SETTINGS
+# Redis
+REDIS_HOST = env("REDIS_HOST")
+REDIS_PORT = env("REDIS_PORT")
 
-CELERY_broker_url = 'redis://127.0.0.1:6379'
-accept_content = ['application/json']
-result_serializer = 'json'
-task_serializer = 'json'
-result_backend = 'django-db'
-timezone = 'UTC'
-
-# CELERY BEAT SCHEDULER
-
+# Celery
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_DEFAULT_QUEUE = 'default'
+CELERY_DEFAULT_EXCHANGE = 'default'
+CELERY_DEFAULT_ROUTING_KEY = 'default'
+CELERY_CACHE_BACKEND = 'default'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+DJANGO_CELERY_BEAT_TZ_AWARE = False
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://127.0.0.1:6379/1",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
