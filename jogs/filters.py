@@ -43,9 +43,16 @@ def build_query_from_dynamic(query: str) -> Q:
                 elif token == 'and':
                     stack.append(element1 & element2)
                 elif token == 'eq':
-                    stack.append(Q(**{element1: element2}))
+                    if isinstance(element2, str) and element1 == 'location':
+                        stack.append(Q(**{element1 + '__icontains': element2}))
+                        #   or __iexact
+                    else:
+                        stack.append(Q(**{element1: element2}))
                 elif token == 'ne':
-                    stack.append(~Q(**{element1: element2}))
+                    if isinstance(element2, str) and element1 == 'location':
+                        stack.append(~Q(**{element1 + '__icontaints': element2}))
+                    else:
+                        stack.append(~Q(**{element1: element2}))
                 elif token == 'gt':
                     stack.append(Q(**{element1 + '__gt': element2}))
                 elif token == 'lt':
