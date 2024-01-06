@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from jogs.models import JoggingRecord
-from jogs.serializers import JoggingRecordSerializer
+from jogs.models import JoggingRecord, WeeklyReport
+from jogs.serializers import JoggingRecordSerializer, WeeklyReportSerializer
 from jogs.permissions import IsOwnerOrReadOnly
 from rest_framework import permissions
 from jogs.filters import DynamicFilterBackend
@@ -34,3 +34,9 @@ class JoggingRecordViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class WeeklyReportViewSet(viewsets.ModelViewSet):
+    queryset = WeeklyReport.objects.all()
+    serializer_class = WeeklyReportSerializer
+    permission_classes = [IsAuthenticated]

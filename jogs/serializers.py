@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from jogs.models import JoggingRecord
+from jogs.models import JoggingRecord, WeeklyReport
 
 
 class JoggingRecordSerializer(serializers.ModelSerializer):
@@ -9,3 +9,9 @@ class JoggingRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = JoggingRecord
         fields = ['id', 'owner', 'created', 'date', 'time', 'distance', 'location', 'weather_condition']
+
+
+class WeeklyReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeeklyReport
+        fields = ['id', 'user', 'start_date', 'end_date', 'avg_speed', 'total_distance']

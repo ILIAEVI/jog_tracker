@@ -33,3 +33,14 @@ class JoggingRecord(models.Model):
         self.weather_condition = weather_conditions
 
         super().save(*args, **kwargs)
+
+
+class WeeklyReport(models.Model):
+    user = models.ForeignKey(User, related_name='weekly_reports', on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    avg_speed = models.FloatField(default=0)
+    total_distance = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ['user', 'start_date']
