@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 from accounts.models import User
 
+
 @shared_task
 def generate_weekly_report(user_id):
     user = User.objects.get(pk=user_id)

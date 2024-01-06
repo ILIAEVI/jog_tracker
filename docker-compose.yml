@@ -15,10 +15,36 @@ services:
       - "5432:5432"
     healthcheck:
       test:
-        ["CMD", "pg_isready", "-q", "-d", "jog_db", "-U", "jog"]
+        ["CMD", "pg_isready", "-q", "-d", "jog", "-U", "jog"]
       timeout: 45s
       interval: 10s
       retries: 10
+
+  backend:
+    container_name: jog_tracker_backend
+    build: .
+    restart: always
+    env_file: ./jog_tracker/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  celery_worker:
+    container_name: jog_tracker_celery_worker
+    build: .
+    command: celery -A jog_tracker worker -l info -c 2 -E -n default_worker@%h
+    env_file: ./jog_tracker/.env
+    depends_on:
+      - db
+      - redis
+    healthcheck:
+      test: celery -A jog_tracker inspect ping -t 3 || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   redis:
     image: redis:alpine
@@ -27,4 +53,3 @@ services:
 
 volumes:
   postgres_data:
-  metabase_data:
