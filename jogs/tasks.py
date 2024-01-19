@@ -1,3 +1,5 @@
+import datetime
+
 from celery import shared_task
 from django.db.models import Avg, Sum
 from .models import JoggingRecord, WeeklyReport
@@ -17,8 +19,13 @@ def generate_weekly_report(user_id):
     weekly_records = JoggingRecord.objects.filter(owner=user, date__range=[start_date, end_date])
 
     if weekly_records.exists():
-        average_speed = weekly_records.aggregate(avg_speed=Avg('distance') / Avg('time'))['avg_speed']
-        total_distance = weekly_records.aggregate(sum_distance=Sum('distance'))['sum_distance']
+        aggregates = weekly_records.aggregate(
+            avg_distance=Avg('distance'), avg_time=Avg('time'),
+            sum_distance=Sum('distance')
+        )
+        avg_time: datetime.timedelta = aggregates['avg_time']
+        average_speed = aggregates['avg_distance'] / avg_time.total_seconds()
+        total_distance = aggregates['sum_distance']
     else:
         average_speed = 0
         total_distance = 0
