@@ -9,31 +9,33 @@ from accounts.models import User
 
 
 @shared_task
-def generate_weekly_report(user_id):
-    user = User.objects.get(pk=user_id)
+def generate_weekly_report():
+    users = User.objects.all()
 
-    today = timezone.now().date()
-    start_date = today - timedelta(days=today.weekday())
-    end_date = start_date + timedelta(days=6)
+    for user in users:
 
-    weekly_records = JoggingRecord.objects.filter(owner=user, date__range=[start_date, end_date])
+        today = timezone.now().date()
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
 
-    if weekly_records.exists():
-        aggregates = weekly_records.aggregate(
-            avg_distance=Avg('distance'), avg_time=Avg('time'),
-            sum_distance=Sum('distance')
-        )
-        avg_time: datetime.timedelta = aggregates['avg_time']
-        average_speed = aggregates['avg_distance'] / avg_time.total_seconds()
-        total_distance = aggregates['sum_distance']
-    else:
-        average_speed = 0
-        total_distance = 0
+        weekly_records = JoggingRecord.objects.filter(owner=user, date__range=[start_date, end_date])
 
-    try:
-        report, created = WeeklyReport.objects.get_or_create(user=user, start_date=start_date, end_date=end_date)
-        report.avg_speed = average_speed
-        report.total_distance = total_distance
-        report.save()
-    except Exception as e:
-        print(f"Error creating/updating weekly report for {user}: {e}")
+        if weekly_records.exists():
+            aggregates = weekly_records.aggregate(
+                avg_distance=Avg('distance'), avg_time=Avg('time'),
+                sum_distance=Sum('distance')
+            )
+            avg_time: datetime.timedelta = aggregates['avg_time']
+            average_speed = aggregates['avg_distance'] / avg_time.total_seconds()
+            total_distance = aggregates['sum_distance']
+        else:
+            average_speed = 0
+            total_distance = 0
+
+        try:
+            report, created = WeeklyReport.objects.get_or_create(user=user, start_date=start_date, end_date=end_date)
+            report.avg_speed = average_speed
+            report.total_distance = total_distance
+            report.save()
+        except Exception as e:
+            print(f"Error creating/updating weekly report for {user}: {e}")

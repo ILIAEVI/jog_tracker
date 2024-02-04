@@ -40,3 +40,22 @@ class WeeklyReportViewSet(viewsets.ModelViewSet):
     queryset = WeeklyReport.objects.all()
     serializer_class = WeeklyReportSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [IsAuthenticated()]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            return [IsOwnerOrReadOnly()]
+
+        return [permissions.IsAuthenticatedOrReadOnly(), IsOwnerOrReadOnly()]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_authenticated:
+            if user.role == 'admin':
+                return WeeklyReport.objects.all()
+            else:
+                return WeeklyReport.objects.filter(owner=user)
+        else:
+            return WeeklyReport.objects.none()

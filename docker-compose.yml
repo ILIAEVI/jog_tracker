@@ -32,10 +32,10 @@ services:
       - db
       - redis
 
-  celery_worker:
-    container_name: jog_tracker_celery_worker
+  celery_beat:
+    container_name: jog_tracker_celery_beat
     build: .
-    command: celery -A jog_tracker worker -l info -c 2 -E -n default_worker@%h
+    command: celery -A jog_tracker beat -l info
     env_file: ./jog_tracker/.env
     depends_on:
       - db

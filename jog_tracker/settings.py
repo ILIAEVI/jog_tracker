@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from celery.schedules import crontab
 import environ
 
 
@@ -169,6 +170,14 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 DJANGO_CELERY_BEAT_TZ_AWARE = False
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+CELERY_BEAT_SCHEDULE = {
+    "generate-weekly-report": {
+        "task": "jogs.tasks.generate_weekly_report",
+        "schedule": crontab(hour='15', minute='56', day_of_week='mon')
+    }
+}
+
 
 CACHES = {
     "default": {
