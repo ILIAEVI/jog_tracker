@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 15,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     )
@@ -174,7 +174,7 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
     "generate-weekly-report": {
         "task": "jogs.tasks.generate_weekly_report",
-        "schedule": crontab(hour='15', minute='56', day_of_week='mon')
+        "schedule": crontab(hour='11', minute='19', day_of_week='wed')
     }
 }
 

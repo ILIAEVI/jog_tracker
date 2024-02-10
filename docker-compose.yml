@@ -20,33 +20,6 @@ services:
       interval: 10s
       retries: 10
 
-  backend:
-    container_name: jog_tracker_backend
-    build: .
-    restart: always
-    env_file: ./jog_tracker/.env
-    ports:
-      - "8000:8000"
-    command: ["sh", "./start.sh"]
-    depends_on:
-      - db
-      - redis
-
-  celery_beat:
-    container_name: jog_tracker_celery_beat
-    build: .
-    command: celery -A jog_tracker beat -l info
-    env_file: ./jog_tracker/.env
-    depends_on:
-      - db
-      - redis
-    healthcheck:
-      test: celery -A jog_tracker inspect ping -t 3 || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
   redis:
     image: redis:alpine
     ports:

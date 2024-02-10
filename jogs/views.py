@@ -18,8 +18,8 @@ class JoggingRecordViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated()]
         elif self.action in ['update', 'partial_update', 'destroy']:
             return [IsOwnerOrReadOnly()]
-
-        return [permissions.IsAuthenticatedOrReadOnly(), IsOwnerOrReadOnly()]
+        # changed IsAuthenticatedOrReadOnly() with  IsAuthenticated
+        return [permissions.IsAuthenticated(), IsOwnerOrReadOnly()]
 
     def get_queryset(self):
         user = self.request.user

@@ -2,9 +2,15 @@ from rest_framework.filters import BaseFilterBackend
 from django.db.models import Q
 
 
+class InvalidQueryException(Exception):
+    pass
+
+
 def build_query_from_dynamic(query: str) -> Q:
     operators = {'or', 'and', 'eq', 'ne', 'gt', 'lt'}
     priority = {'or': 1, 'and': 2, 'eq': 3, 'ne': 3, 'gt': 4, 'lt': 4}
+    valid_keywords = ['or', 'and', 'eq', 'ne', 'gt', 'lt', 'distance', 'location', 'owner', 'date', 'time',
+                      'weather_condition', 'created']
 
     def tokenize(input_string: str):
         lowercase_string = input_string.lower()
@@ -24,6 +30,8 @@ def build_query_from_dynamic(query: str) -> Q:
             elif token == ')':
                 while stack and stack[-1] != '(':
                     output.append(stack.pop())
+                if not stack:
+                    raise InvalidQueryException("Unbalanced parentheses in the query")
                 stack.pop()
             else:
                 output.append(token)
@@ -50,7 +58,7 @@ def build_query_from_dynamic(query: str) -> Q:
                         stack.append(Q(**{element1: element2}))
                 elif token == 'ne':
                     if isinstance(element2, str) and element1 == 'location':
-                        stack.append(~Q(**{element1 + '__icontaints': element2}))
+                        stack.append(~Q(**{element1 + '__icontains': element2}))
                     else:
                         stack.append(~Q(**{element1: element2}))
                 elif token == 'gt':
@@ -74,7 +82,11 @@ class DynamicFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         value = request.query_params.get("q")
         if value is not None:
-            query = build_query_from_dynamic(value)
-            return queryset.filter(query)
+            try:
+
+                query = build_query_from_dynamic(value)
+                return queryset.filter(query)
+            except InvalidQueryException as e:
+                raise ValueError(str(e))
         else:
             return queryset

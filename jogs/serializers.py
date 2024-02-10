@@ -14,4 +14,4 @@ class JoggingRecordSerializer(serializers.ModelSerializer):
 class WeeklyReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeeklyReport
-        fields = ['id', 'user', 'start_date', 'end_date', 'avg_speed', 'total_distance']
+        fields = ['id', 'owner', 'start_date', 'end_date', 'avg_speed', 'total_distance']
