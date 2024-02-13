@@ -87,3 +87,4 @@ class TestAdminCrud(APITestCase):
         delete_endpoint = reverse_lazy("jogging-records-detail", args=[self.id])
         response = self.client.delete(delete_endpoint, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        

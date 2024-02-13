@@ -1,7 +1,7 @@
 import datetime
 
 from celery import shared_task
-from django.db.models import Avg, Sum
+from django.db.models import Sum
 from .models import JoggingRecord, WeeklyReport
 from django.utils import timezone
 from datetime import timedelta

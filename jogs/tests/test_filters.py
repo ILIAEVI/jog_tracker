@@ -33,6 +33,6 @@ class TestDynamicFilter(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
 
-        response = self.client.get(endpoint, {"q": "date eq 2024-02-08"})
+        response = self.client.get(endpoint, {"q": "date eq 2024-02-11"}) # timezone.now().date(),
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)

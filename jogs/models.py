@@ -4,6 +4,10 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from jogs.utils import get_weather_condition
+import environ
+
+
+env = environ.Env()
 
 
 def validate_positive_duration(value):
@@ -27,7 +31,7 @@ class JoggingRecord(models.Model):
         ordering = ['created']
 
     def save(self, *args, **kwargs):
-        api_key = '58f6ef66d7384bf8bc690701232511'
+        api_key = env('API_KEY')
         weather_conditions = get_weather_condition(api_key, self.date, self.location)
 
         self.weather_condition = weather_conditions
