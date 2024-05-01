@@ -20,6 +20,9 @@ It also supports different permission levels for users, user managers, and admin
 - Django REST Framework
 - Python
 - Weather API
+- Docker
+- Redis
+- Celery, Celery Beat
 - PostgreSQL
 
 ## Getting Started
